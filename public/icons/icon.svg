@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0b1329" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#10b981" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Rounded Rect -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+  
+  <!-- Subtle Border Highlight -->
+  <rect x="8" y="8" width="496" height="496" rx="120" fill="none" stroke="rgba(255, 255, 255, 0.12)" stroke-width="4" />
+
+  <!-- Modern Property / Building Towers Silhouette -->
+  <path d="M120 370 V220 L210 160 V370 Z" fill="#334155" opacity="0.8" />
+  <path d="M210 370 V130 L310 70 V370 Z" fill="url(#accentGrad)" filter="url(#glow)" />
+  <path d="M310 370 V200 L392 250 V370 Z" fill="#1e293b" stroke="#334155" stroke-width="4" />
+
+  <!-- Windows in Towers -->
+  <rect x="236" y="150" width="16" height="24" rx="4" fill="#ffffff" opacity="0.9" />
+  <rect x="268" y="150" width="16" height="24" rx="4" fill="#ffffff" opacity="0.9" />
+  <rect x="236" y="195" width="16" height="24" rx="4" fill="#ffffff" opacity="0.9" />
+  <rect x="268" y="195" width="16" height="24" rx="4" fill="#ffffff" opacity="0.9" />
+  <rect x="236" y="240" width="16" height="24" rx="4" fill="#ffffff" opacity="0.9" />
+  <rect x="268" y="240" width="16" height="24" rx="4" fill="#ffffff" opacity="0.9" />
+  <rect x="236" y="285" width="16" height="24" rx="4" fill="#ffffff" opacity="0.9" />
+  <rect x="268" y="285" width="16" height="24" rx="4" fill="#ffffff" opacity="0.9" />
+
+  <!-- Calculator / Rupee Floating Disc -->
+  <circle cx="370" cy="370" r="76" fill="#0f172a" stroke="url(#goldGrad)" stroke-width="8" filter="url(#glow)" />
+  
+  <!-- Rupee Symbol ₹ -->
+  <text x="370" y="402" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="78" font-weight="900" fill="#f59e0b" text-anchor="middle">₹</text>
+  
+  <!-- Foundation Bar -->
+  <rect x="90" y="370" width="332" height="16" rx="8" fill="#475569" />
+</svg>

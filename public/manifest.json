@@ -1,0 +1,35 @@
+{
+  "name": "PropCalc - Real Estate Agreement Value Calculator",
+  "short_name": "PropCalc",
+  "description": "Offline Real Estate Agreement Value, Taxes, Development Charges & Cost Sheet Calculator",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["business", "finance", "productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "New Calculation",
+      "short_name": "Calculate",
+      "description": "Start a new property agreement value calculation",
+      "url": "/",
+      "icons": [{ "src": "/icons/icon.svg", "sizes": "192x192" }]
+    }
+  ]
+}
