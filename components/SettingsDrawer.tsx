@@ -32,16 +32,16 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
           </button>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px', maxHeight: '60vh', overflowY: 'auto' }}>
           {/* GST % Input */}
           <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-sm)', padding: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <label style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-main)' }}>
-                  GST Percentage
+                  Property GST Percentage
                 </label>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                  Default is 12%
+                  Default is 12% (5% for Sheetal Sangam)
                 </div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -75,6 +75,30 @@ export const SettingsDrawer: React.FC<SettingsDrawerProps> = ({
                   style={{ width: '70px', background: '#ffffff', border: '1px solid var(--border-light)', borderRadius: '4px', padding: '6px 8px', fontFamily: 'var(--font-mono)', fontSize: '14px', textAlign: 'right', fontWeight: 700 }}
                   value={inputs.stampDutyPercent}
                   onChange={(e) => onUpdateInputs({ stampDutyPercent: Number(e.target.value) || 0 })}
+                />
+                <span style={{ fontSize: '13px', fontWeight: 700 }}>%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* GST on Brokerage % Input */}
+          <div style={{ background: 'var(--bg-input)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-sm)', padding: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <label style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-main)' }}>
+                  GST on Brokerage (Invoice)
+                </label>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                  Standard is 18%
+                </div>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <input
+                  type="number"
+                  step="1"
+                  style={{ width: '70px', background: '#ffffff', border: '1px solid var(--border-light)', borderRadius: '4px', padding: '6px 8px', fontFamily: 'var(--font-mono)', fontSize: '14px', textAlign: 'right', fontWeight: 700 }}
+                  value={inputs.brokerageGstPercent ?? 18}
+                  onChange={(e) => onUpdateInputs({ brokerageGstPercent: Number(e.target.value) || 0 })}
                 />
                 <span style={{ fontSize: '13px', fontWeight: 700 }}>%</span>
               </div>

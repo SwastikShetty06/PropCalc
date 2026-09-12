@@ -18,6 +18,7 @@ export interface CalculationInputs {
 
   // Brokerage configuration (Calculated strictly on AGV)
   brokeragePercent: number;    // default 3.5%
+  brokerageGstPercent?: number; // default 18%
   cumulativeSoldSqFt?: number; // for ladder tier detection
 }
 
@@ -62,9 +63,13 @@ export interface SheetalCostBreakdown {
     notes: string;
   };
   
-  // CP Brokerage on AGV
+  // CP Brokerage & GST on Brokerage
   brokeragePercent: number;
   brokerageAmount: number;
+  brokerageGstPercent: number; // 18%
+  brokerageGstAmount: number;
+  brokerageTotalPayout: number;
+  brokerageTotalInWords: string;
 }
 
 export interface BrokerageLadderTier {
@@ -105,10 +110,14 @@ export interface CalculationResult {
   items: CostBreakdownItem[];
   amountInWords: string;
 
-  // Channel Partner Brokerage details (On AGV)
+  // Channel Partner Brokerage details & GST on Brokerage (18%)
   brokeragePercent: number;
   brokerageAmount: number;
+  brokerageGstPercent: number;
+  brokerageGstAmount: number;
+  brokerageTotalPayout: number;
   brokerageInWords: string;
+  brokerageTotalInWords: string;
   applicableTier: BrokerageLadderTier;
 }
 

@@ -93,6 +93,7 @@ export const DEFAULT_INPUTS: CalculationInputs = {
   devChargesFlatRate: 555000,
   devChargesPsfRate: 800,
   brokeragePercent: 3.5,
+  brokerageGstPercent: 18, // 18% GST on brokerage invoice
   cumulativeSoldSqFt: 668,
 };
 
@@ -264,9 +265,12 @@ export function calculateAll(inputs: CalculationInputs): CalculationResult {
   // 7. Grand Total
   const grandTotal = agreementValue + gstAmount + stampDutyAmount + regLegalCharges + devChargesAmount + carParkingAmount;
 
-  // 8. Channel Partner Brokerage (STRICTLY ON AGREEMENT VALUE, NOT ON GRAND TOTAL)
+  // 8. Channel Partner Brokerage & GST on Brokerage (STRICTLY ON AGV)
   const brokeragePercent = Number(inputs.brokeragePercent) || 3.5;
+  const brokerageGstPercent = Number(inputs.brokerageGstPercent) || 18;
   const brokerageAmount = Math.round(agreementValue * (brokeragePercent / 100));
+  const brokerageGstAmount = Math.round(brokerageAmount * (brokerageGstPercent / 100));
+  const brokerageTotalPayout = brokerageAmount + brokerageGstAmount;
   const applicableTier = getTierForVolume(inputs.cumulativeSoldSqFt || carpetArea);
 
   // Line items
@@ -344,7 +348,11 @@ export function calculateAll(inputs: CalculationInputs): CalculationResult {
     amountInWords: numberToIndianWords(grandTotal),
     brokeragePercent,
     brokerageAmount,
+    brokerageGstPercent,
+    brokerageGstAmount,
+    brokerageTotalPayout,
     brokerageInWords: numberToIndianWords(brokerageAmount),
+    brokerageTotalInWords: numberToIndianWords(brokerageTotalPayout),
     applicableTier,
   };
 }
@@ -358,7 +366,8 @@ export function calculateSheetalCost(
   customRate?: number,
   customParking: number = 1200000,
   customDevCharges: number = 555000,
-  brokeragePercent: number = 3.5
+  brokeragePercent: number = 3.5,
+  brokerageGstPercent: number = 18
 ): SheetalCostBreakdown {
   const baseRate = customRate ?? (scheme === 'CLP' ? 30500 : 32500);
   const agreementValue = Math.round(carpetArea * baseRate);
@@ -416,7 +425,10 @@ export function calculateSheetalCost(
     };
   }
 
+  // Brokerage + 18% GST on Brokerage
   const brokerageAmount = Math.round(agreementValue * (brokeragePercent / 100));
+  const brokerageGstAmount = Math.round(brokerageAmount * (brokerageGstPercent / 100));
+  const brokerageTotalPayout = brokerageAmount + brokerageGstAmount;
 
   return {
     carpetArea,
@@ -436,5 +448,9 @@ export function calculateSheetalCost(
     schedule,
     brokeragePercent,
     brokerageAmount,
+    brokerageGstPercent,
+    brokerageGstAmount,
+    brokerageTotalPayout,
+    brokerageTotalInWords: numberToIndianWords(brokerageTotalPayout),
   };
 }

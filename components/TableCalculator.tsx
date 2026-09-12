@@ -50,11 +50,6 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
     updateInput('carParkingCustomAmount', num);
   };
 
-  const handleBrokerageChange = (val: string) => {
-    const num = parseFloat(val) || 0;
-    updateInput('brokeragePercent', num);
-  };
-
   return (
     <div style={{ width: '100%', maxWidth: '580px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
       {/* Primary Cost Sheet Table (Exact Clean Match to Handwritten Note) */}
@@ -128,7 +123,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
           {/* Divider */}
           <div className="table-divider-subtle" />
 
-          {/* GST Row (Clean without inline chips, configured in settings) */}
+          {/* GST Row */}
           <div className="table-row">
             <div className="row-label-col">
               <span>GST {inputs.gstPercent}%</span>
@@ -139,7 +134,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
             </div>
           </div>
 
-          {/* Stamp Duty Row (Clean without inline chips, configured in settings) */}
+          {/* Stamp Duty Row */}
           <div className="table-row">
             <div className="row-label-col">
               <span>Stamp Duty {inputs.stampDutyPercent}%</span>
@@ -173,7 +168,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
             </div>
           </div>
 
-          {/* Development Charges Row (Auto Calculated by threshold) */}
+          {/* Development Charges Row */}
           <div className="table-row">
             <div className="row-label-col">
               <div>
@@ -231,7 +226,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
         </div>
       </div>
 
-      {/* Channel Partner (CP) Brokerage Section (Separate Card, strictly calculated on AGV) */}
+      {/* Channel Partner (CP) Brokerage Section with GST on Brokerage */}
       <div
         className="sheet-card"
         style={{
@@ -246,7 +241,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
               Channel Partner (CP) Brokerage
             </span>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
-              Commission calculated strictly on Agreement Value (AGV)
+              Commission calculated strictly on Agreement Value (AGV) + 18% GST
             </div>
           </div>
 
@@ -340,22 +335,34 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
             </button>
           </div>
 
-          {/* Brokerage Result Display */}
+          {/* Line items for Brokerage and GST on Brokerage */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '1px dashed var(--border-light)', paddingTop: '8px', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+              <span style={{ color: 'var(--text-label)' }}>Base Brokerage ({inputs.brokeragePercent}%):</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700 }}>{formatIndianCurrency(result.brokerageAmount)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+              <span style={{ color: 'var(--text-label)' }}>+ GST on Brokerage ({result.brokerageGstPercent}%):</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: '#3b82f6' }}>{formatIndianCurrency(result.brokerageGstAmount)}</span>
+            </div>
+          </div>
+
+          {/* Total Brokerage Payout */}
           <div
             style={{
-              borderTop: '1px dashed var(--border-light)',
-              paddingTop: '10px',
+              borderTop: '2px solid #0f172a',
+              paddingTop: '8px',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'baseline',
             }}
           >
             <div>
-              <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-                Total CP Brokerage Payout
+              <div style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', color: 'var(--text-main)' }}>
+                Total Payout (Incl. GST)
               </div>
               <div style={{ fontSize: '11px', color: '#16a34a', fontWeight: 600, marginTop: '2px' }}>
-                {result.brokerageInWords}
+                {result.brokerageTotalInWords}
               </div>
             </div>
 
@@ -367,7 +374,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
                 color: '#16a34a',
               }}
             >
-              {formatIndianCurrency(result.brokerageAmount)}
+              {formatIndianCurrency(result.brokerageTotalPayout)}
             </div>
           </div>
         </div>

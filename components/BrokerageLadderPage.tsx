@@ -16,13 +16,6 @@ export const BrokerageLadderPage: React.FC<BrokerageLadderPageProps> = ({
   result,
   onUpdateBrokerage,
 }) => {
-  const [testArea, setTestArea] = useState<number>(inputs.cumulativeSoldSqFt || inputs.carpetArea);
-
-  const calculateTierEarnings = (ratePsf: number, area: number, percent: number) => {
-    const agv = area * ratePsf;
-    return Math.round(agv * (percent / 100));
-  };
-
   return (
     <div className="sheet-card" style={{ padding: '20px' }}>
       {/* Header Banner */}
@@ -44,7 +37,7 @@ export const BrokerageLadderPage: React.FC<BrokerageLadderPageProps> = ({
           BOOST YOUR <span style={{ color: '#f59e0b', fontStyle: 'italic' }}>Earnings</span>
         </h2>
         <p style={{ fontSize: '12px', color: '#cbd5e1', lineHeight: '1.4' }}>
-          Maximize your brokerage with every square foot sold. Earn up to 5.0% commission on Agreement Value (AGV).
+          Maximize your brokerage with every square foot sold. Earn up to 5.0% commission on Agreement Value (AGV) + 18% GST.
         </p>
 
         <div
@@ -61,7 +54,7 @@ export const BrokerageLadderPage: React.FC<BrokerageLadderPageProps> = ({
         >
           <Award size={14} color="#f59e0b" />
           <span>
-            Current Unit AGV: <strong>{formatIndianCurrency(result.agreementValue)}</strong> (Brokerage applies only on AGV)
+            Current Unit AGV: <strong>{formatIndianCurrency(result.agreementValue)}</strong> (Calculated strictly on AGV)
           </span>
         </div>
       </div>
@@ -75,7 +68,9 @@ export const BrokerageLadderPage: React.FC<BrokerageLadderPageProps> = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {BROKERAGE_LADDER_TIERS.map((tier) => {
             const isSelected = inputs.brokeragePercent === tier.percent;
-            const payoutForCurrentUnit = Math.round(result.agreementValue * (tier.percent / 100));
+            const baseCommission = Math.round(result.agreementValue * (tier.percent / 100));
+            const gstOnBrokerage = Math.round(baseCommission * ((inputs.brokerageGstPercent || 18) / 100));
+            const totalPayout = baseCommission + gstOnBrokerage;
 
             return (
               <div
@@ -118,10 +113,10 @@ export const BrokerageLadderPage: React.FC<BrokerageLadderPageProps> = ({
 
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '14px', fontWeight: 800, color: isSelected ? '#16a34a' : '#0f172a' }}>
-                    {formatIndianCurrency(payoutForCurrentUnit)}
+                    {formatIndianCurrency(totalPayout)}
                   </div>
                   <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
-                    Payout for this unit
+                    Base: {formatIndianCurrency(baseCommission)} + 18% GST
                   </div>
                 </div>
               </div>
@@ -169,7 +164,7 @@ export const BrokerageLadderPage: React.FC<BrokerageLadderPageProps> = ({
 
       {/* Terms footnote */}
       <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontStyle: 'italic', textAlign: 'center' }}>
-        *Terms &amp; conditions applicable. Brokerage is calculated exclusively on Agreement Value (AGV).
+        *Terms &amp; conditions applicable. Brokerage is calculated exclusively on Agreement Value (AGV) + 18% GST.
       </div>
     </div>
   );

@@ -48,6 +48,12 @@ export const ShareModal: React.FC<ShareModalProps> = ({
     text += `*Total                  =    ${formatIndianCurrency(result.grandTotal)}*\n`;
     text += `_${result.amountInWords}_\n`;
     text += `─────────────────────────\n`;
+    text += `🤝 *CP BROKERAGE SUMMARY:*\n`;
+    text += `• Base Commission (${result.brokeragePercent}% on AGV): ${formatIndianCurrency(result.brokerageAmount)}\n`;
+    text += `• GST on Brokerage (${result.brokerageGstPercent}%): ${formatIndianCurrency(result.brokerageGstAmount)}\n`;
+    text += `• *Total Brokerage Payout:* ${formatIndianCurrency(result.brokerageTotalPayout)}\n`;
+    text += `_${result.brokerageTotalInWords}_\n`;
+    text += `─────────────────────────\n`;
     text += `Documents Checklist:\n`;
     text += `• Developer Agreement\n• NOC's\n• Power of Attorney\n• LOI\n• IOD\n`;
     return text;

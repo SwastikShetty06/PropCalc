@@ -28,6 +28,7 @@ export const SheetalSangamPage: React.FC<SheetalSangamPageProps> = ({
   const [customParking, setCustomParking] = useState<number>(1200000);
   const [customDevCharges, setCustomDevCharges] = useState<number>(555000);
   const [brokeragePercent, setBrokeragePercent] = useState<number>(3.5);
+  const [brokerageGstPercent, setBrokerageGstPercent] = useState<number>(18);
   const [copiedIndex, setCopiedIndex] = useState<string | null>(null);
 
   // Sync custom rate on scheme switch if not explicitly modified
@@ -40,9 +41,9 @@ export const SheetalSangamPage: React.FC<SheetalSangamPageProps> = ({
 
   // Pre-calculated default units for comparison matrix
   const unitCalculations: Record<number, SheetalCostBreakdown> = {
-    585: calculateSheetalCost(585, scheme, isCustomizing ? customRate : undefined, customParking, customDevCharges, brokeragePercent),
-    690: calculateSheetalCost(690, scheme, isCustomizing ? customRate : undefined, customParking, customDevCharges, brokeragePercent),
-    710: calculateSheetalCost(710, scheme, isCustomizing ? customRate : undefined, customParking, customDevCharges, brokeragePercent),
+    585: calculateSheetalCost(585, scheme, isCustomizing ? customRate : undefined, customParking, customDevCharges, brokeragePercent, brokerageGstPercent),
+    690: calculateSheetalCost(690, scheme, isCustomizing ? customRate : undefined, customParking, customDevCharges, brokeragePercent, brokerageGstPercent),
+    710: calculateSheetalCost(710, scheme, isCustomizing ? customRate : undefined, customParking, customDevCharges, brokeragePercent, brokerageGstPercent),
   };
 
   const activeCalculation = unitCalculations[selectedUnitArea] || unitCalculations[585];
@@ -73,7 +74,10 @@ export const SheetalSangamPage: React.FC<SheetalSangamPageProps> = ({
       text += `• 70% ON POSSESSION: ${formatIndianCurrency(calc.schedule.possessionAmount || 0)} + GST 5%: ${formatIndianCurrency(calc.schedule.possessionGst || 0)} = *${formatIndianCurrency(calc.schedule.possessionTotal || 0)}*\n`;
     }
     text += `━━━━━━━━━━━━━━━━━━━━━\n`;
-    text += `🤝 *CP Brokerage (on AGV @ ${calc.brokeragePercent}%):* ${formatIndianCurrency(calc.brokerageAmount)}\n`;
+    text += `🤝 *CP BROKERAGE SUMMARY:*\n`;
+    text += `• Base Brokerage (${calc.brokeragePercent}% on AGV): ${formatIndianCurrency(calc.brokerageAmount)}\n`;
+    text += `• GST on Brokerage (${calc.brokerageGstPercent}%): ${formatIndianCurrency(calc.brokerageGstAmount)}\n`;
+    text += `• *Total Brokerage Payout:* ${formatIndianCurrency(calc.brokerageTotalPayout)}\n`;
     text += `_Generated via PropCalc App_`;
     return text;
   };
@@ -108,6 +112,7 @@ export const SheetalSangamPage: React.FC<SheetalSangamPageProps> = ({
       devChargesFlatRate: calc.devChargesAmount,
       devChargesPsfRate: 800,
       brokeragePercent: calc.brokeragePercent,
+      brokerageGstPercent: calc.brokerageGstPercent,
       cumulativeSoldSqFt: calc.carpetArea,
     };
     onLoadIntoCustomCalculator(inputs, 'Sheetal Sangam');
@@ -244,18 +249,6 @@ export const SheetalSangamPage: React.FC<SheetalSangamPageProps> = ({
 
             <div>
               <label style={{ fontSize: '11px', fontWeight: 700, color: '#78350f', display: 'block', marginBottom: '2px' }}>
-                Development Charges (₹)
-              </label>
-              <input
-                type="number"
-                style={{ width: '100%', padding: '6px 8px', borderRadius: '4px', border: '1px solid #fcd34d', background: '#ffffff', fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 700 }}
-                value={customDevCharges}
-                onChange={(e) => setCustomDevCharges(Number(e.target.value) || 0)}
-              />
-            </div>
-
-            <div>
-              <label style={{ fontSize: '11px', fontWeight: 700, color: '#78350f', display: 'block', marginBottom: '2px' }}>
                 CP Brokerage (%)
               </label>
               <input
@@ -264,6 +257,19 @@ export const SheetalSangamPage: React.FC<SheetalSangamPageProps> = ({
                 style={{ width: '100%', padding: '6px 8px', borderRadius: '4px', border: '1px solid #fcd34d', background: '#ffffff', fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 700 }}
                 value={brokeragePercent}
                 onChange={(e) => setBrokeragePercent(Number(e.target.value) || 0)}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#78350f', display: 'block', marginBottom: '2px' }}>
+                GST on Brokerage (%)
+              </label>
+              <input
+                type="number"
+                step="1"
+                style={{ width: '100%', padding: '6px 8px', borderRadius: '4px', border: '1px solid #fcd34d', background: '#ffffff', fontFamily: 'var(--font-mono)', fontSize: '13px', fontWeight: 700 }}
+                value={brokerageGstPercent}
+                onChange={(e) => setBrokerageGstPercent(Number(e.target.value) || 0)}
               />
             </div>
           </div>
@@ -498,16 +504,27 @@ export const SheetalSangamPage: React.FC<SheetalSangamPageProps> = ({
               </tr>
             )}
 
-            {/* CP BROKERAGE ROW */}
+            {/* CP BROKERAGE SECTION WITH 18% GST */}
             <tr style={{ background: '#f8fafc', borderBottom: '1px solid var(--border-light)' }}>
               <td style={{ padding: '8px', textAlign: 'left', fontFamily: 'var(--font-sans)', fontWeight: 700, color: '#d97706' }}>
                 CP BROKERAGE ({brokeragePercent}%)
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 500 }}>
+                  + 18% GST on Invoice
+                </div>
               </td>
-              {SHEETAL_SANGAM_UNITS.map((u) => (
-                <td key={u.id} style={{ padding: '8px', fontWeight: 800, color: '#d97706' }}>
-                  {formatIndianCurrency(unitCalculations[u.carpetArea].brokerageAmount)}
-                </td>
-              ))}
+              {SHEETAL_SANGAM_UNITS.map((u) => {
+                const c = unitCalculations[u.carpetArea];
+                return (
+                  <td key={u.id} style={{ padding: '8px' }}>
+                    <div style={{ fontWeight: 800, color: '#d97706' }}>
+                      {formatIndianCurrency(c.brokerageTotalPayout)}
+                    </div>
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                      Base: {formatIndianCurrency(c.brokerageAmount)} + GST: {formatIndianCurrency(c.brokerageGstAmount)}
+                    </div>
+                  </td>
+                );
+              })}
             </tr>
 
             {/* ACTIONS ROW */}
