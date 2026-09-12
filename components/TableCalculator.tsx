@@ -9,8 +9,6 @@ interface TableCalculatorProps {
   inputs: CalculationInputs;
   result: CalculationResult;
   onChange: (inputs: CalculationInputs) => void;
-  activeField: string | null;
-  onSelectField: (field: string) => void;
   onOpenLadderPage?: () => void;
 }
 
@@ -18,8 +16,6 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
   inputs,
   result,
   onChange,
-  activeField,
-  onSelectField,
   onOpenLadderPage,
 }) => {
   const updateInput = (key: keyof CalculationInputs, value: any) => {
@@ -65,10 +61,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
         {/* Main Table */}
         <div className="cost-table">
           {/* Carpet Area Row */}
-          <div
-            className={`table-row ${activeField === 'carpetArea' ? 'active-row' : ''}`}
-            onClick={() => onSelectField('carpetArea')}
-          >
+          <div className="table-row">
             <div className="row-label-col">
               <span>Carpet Area</span>
             </div>
@@ -80,17 +73,14 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
                 className="table-input-pill"
                 value={inputs.carpetArea || ''}
                 onChange={(e) => handleCarpetChange(e.target.value)}
-                onFocus={() => onSelectField('carpetArea')}
+                placeholder="668"
               />
               <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>sq.ft</span>
             </div>
           </div>
 
           {/* Rate PSF Row */}
-          <div
-            className={`table-row ${activeField === 'ratePerSqFt' ? 'active-row' : ''}`}
-            onClick={() => onSelectField('ratePerSqFt')}
-          >
+          <div className="table-row">
             <div className="row-label-col">
               <span>Rate (PSF)</span>
             </div>
@@ -104,7 +94,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
                 style={{ width: '110px' }}
                 value={inputs.ratePerSqFt ? inputs.ratePerSqFt.toLocaleString('en-IN') : ''}
                 onChange={(e) => handleRateChange(e.target.value)}
-                onFocus={() => onSelectField('ratePerSqFt')}
+                placeholder="25,000"
               />
             </div>
           </div>
@@ -146,10 +136,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
           </div>
 
           {/* Reg & Legal Charges Row */}
-          <div
-            className={`table-row ${activeField === 'regLegalCharges' ? 'active-row' : ''}`}
-            onClick={() => onSelectField('regLegalCharges')}
-          >
+          <div className="table-row">
             <div className="row-label-col">
               <span>Reg &amp; Legal charges</span>
             </div>
@@ -163,7 +150,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
                 style={{ width: '100px' }}
                 value={inputs.regLegalCharges ? inputs.regLegalCharges.toLocaleString('en-IN') : ''}
                 onChange={(e) => handleLegalChange(e.target.value)}
-                onFocus={() => onSelectField('regLegalCharges')}
+                placeholder="50,000"
               />
             </div>
           </div>
@@ -187,10 +174,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
           </div>
 
           {/* Car Parking Row */}
-          <div
-            className={`table-row ${activeField === 'carParking' ? 'active-row' : ''}`}
-            onClick={() => onSelectField('carParking')}
-          >
+          <div className="table-row">
             <div className="row-label-col">
               <span>Car Parking</span>
             </div>
@@ -204,7 +188,7 @@ export const TableCalculator: React.FC<TableCalculatorProps> = ({
                 style={{ width: '120px' }}
                 value={result.carParkingAmount ? result.carParkingAmount.toLocaleString('en-IN') : '0'}
                 onChange={(e) => handleParkingChange(e.target.value)}
-                onFocus={() => onSelectField('carParking')}
+                placeholder="12,00,000"
               />
             </div>
           </div>

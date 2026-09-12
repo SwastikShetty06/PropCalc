@@ -11,7 +11,6 @@ import {
 import {
   getLastInputs,
   saveLastInputs,
-  getSavedQuotes,
   getReceivedDocuments,
 } from '@/lib/storage';
 import { TableCalculator } from '@/components/TableCalculator';
@@ -19,7 +18,6 @@ import { SheetalSangamPage } from '@/components/SheetalSangamPage';
 import { BrokerageLadderPage } from '@/components/BrokerageLadderPage';
 import { ReceivedDocsPage } from '@/components/ReceivedDocsPage';
 import { ShareModal } from '@/components/ShareModal';
-import { SavedQuotesModal } from '@/components/SavedQuotesModal';
 import { SettingsDrawer } from '@/components/SettingsDrawer';
 import { ServiceWorkerManager } from './sw-register';
 import {
@@ -28,12 +26,8 @@ import {
   TrendingUp,
   FolderCheck,
   Share2,
-  Bookmark,
   Sliders,
   RotateCcw,
-  Delete,
-  Check,
-  ChevronDown,
   FileText,
 } from 'lucide-react';
 
@@ -46,12 +40,9 @@ export default function Home() {
   const [inputs, setInputs] = useState<CalculationInputs>(DEFAULT_INPUTS);
   const [receivedDocs, setReceivedDocs] = useState<ReceivedDocument[]>([]);
   const [currentTab, setCurrentTab] = useState<TabType>('sheetal_sangam');
-  const [activeField, setActiveField] = useState<string | null>(null);
-  const [showKeypad, setShowKeypad] = useState<boolean>(false);
 
   // Modals
   const [isShareOpen, setIsShareOpen] = useState(false);
-  const [isSavedQuotesOpen, setIsSavedQuotesOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Metadata
@@ -61,12 +52,9 @@ export default function Home() {
     clientName: '',
   });
 
-  const [savedCount, setSavedCount] = useState(0);
-
   useEffect(() => {
     setInputs(getLastInputs());
     setReceivedDocs(getReceivedDocuments());
-    setSavedCount(getSavedQuotes().length);
   }, []);
 
   const handleInputsChange = (newInputs: CalculationInputs) => {
@@ -80,21 +68,6 @@ export default function Home() {
     setMeta({ projectName: 'Sheetal Sangam', unitNumber: '', clientName: '' });
   };
 
-  const handleLoadQuote = (
-    loadedInputs: CalculationInputs,
-    loadedMeta?: { projectName?: string; unitNumber?: string; clientName?: string }
-  ) => {
-    setInputs(loadedInputs);
-    saveLastInputs(loadedInputs);
-    if (loadedMeta) {
-      setMeta({
-        projectName: loadedMeta.projectName || 'Sheetal Sangam',
-        unitNumber: loadedMeta.unitNumber || '',
-        clientName: loadedMeta.clientName || '',
-      });
-    }
-  };
-
   const handleLoadSheetalUnit = (customInputs: CalculationInputs, projectName: string) => {
     setInputs(customInputs);
     saveLastInputs(customInputs);
@@ -105,64 +78,6 @@ export default function Home() {
   const result: CalculationResult = useMemo(() => {
     return calculateAll(inputs);
   }, [inputs]);
-
-  // Keypad Handlers
-  const handleSelectField = (field: string) => {
-    setActiveField(field);
-    setShowKeypad(true);
-  };
-
-  const handleKeypadPress = (key: string) => {
-    if (!activeField) return;
-
-    let currentValStr = '';
-    if (activeField === 'carpetArea') currentValStr = inputs.carpetArea ? inputs.carpetArea.toString() : '';
-    if (activeField === 'ratePerSqFt') currentValStr = inputs.ratePerSqFt ? inputs.ratePerSqFt.toString() : '';
-    if (activeField === 'regLegalCharges') currentValStr = inputs.regLegalCharges ? inputs.regLegalCharges.toString() : '';
-    if (activeField === 'carParking') currentValStr = inputs.carParkingCustomAmount !== null ? inputs.carParkingCustomAmount.toString() : (inputs.carParkingSlots * inputs.carParkingCostPerSlot).toString();
-
-    const nextValStr = currentValStr + key;
-    const num = Number(nextValStr);
-
-    if (activeField === 'carpetArea') handleInputsChange({ ...inputs, carpetArea: num });
-    if (activeField === 'ratePerSqFt') handleInputsChange({ ...inputs, ratePerSqFt: num });
-    if (activeField === 'regLegalCharges') handleInputsChange({ ...inputs, regLegalCharges: num });
-    if (activeField === 'carParking') handleInputsChange({ ...inputs, useCustomParking: true, carParkingCustomAmount: num });
-  };
-
-  const handleKeypadBackspace = () => {
-    if (!activeField) return;
-
-    let currentValStr = '';
-    if (activeField === 'carpetArea') currentValStr = inputs.carpetArea ? inputs.carpetArea.toString() : '';
-    if (activeField === 'ratePerSqFt') currentValStr = inputs.ratePerSqFt ? inputs.ratePerSqFt.toString() : '';
-    if (activeField === 'regLegalCharges') currentValStr = inputs.regLegalCharges ? inputs.regLegalCharges.toString() : '';
-    if (activeField === 'carParking') currentValStr = inputs.carParkingCustomAmount !== null ? inputs.carParkingCustomAmount.toString() : (inputs.carParkingSlots * inputs.carParkingCostPerSlot).toString();
-
-    const nextValStr = currentValStr.slice(0, -1);
-    const num = nextValStr === '' ? 0 : Number(nextValStr);
-
-    if (activeField === 'carpetArea') handleInputsChange({ ...inputs, carpetArea: num });
-    if (activeField === 'ratePerSqFt') handleInputsChange({ ...inputs, ratePerSqFt: num });
-    if (activeField === 'regLegalCharges') handleInputsChange({ ...inputs, regLegalCharges: num });
-    if (activeField === 'carParking') handleInputsChange({ ...inputs, useCustomParking: true, carParkingCustomAmount: num });
-  };
-
-  const handleKeypadClear = () => {
-    if (!activeField) return;
-    if (activeField === 'carpetArea') handleInputsChange({ ...inputs, carpetArea: 0 });
-    if (activeField === 'ratePerSqFt') handleInputsChange({ ...inputs, ratePerSqFt: 0 });
-    if (activeField === 'regLegalCharges') handleInputsChange({ ...inputs, regLegalCharges: 0 });
-    if (activeField === 'carParking') handleInputsChange({ ...inputs, useCustomParking: true, carParkingCustomAmount: 0 });
-  };
-
-  const getActiveFieldTitle = (): string => {
-    if (activeField === 'carpetArea') return 'Carpet Area (sq.ft)';
-    if (activeField === 'ratePerSqFt') return 'Rate per Sq.Ft (PSF)';
-    if (activeField === 'regLegalCharges') return 'Reg & Legal Charges (₹)';
-    if (activeField === 'carParking') return 'Car Parking Cost (₹)';
-    return 'Select an item to type';
-  };
 
   const contentMaxWidth = currentTab === 'sheetal_sangam' ? '780px' : '580px';
 
@@ -181,19 +96,8 @@ export default function Home() {
 
           <button
             className="btn-icon"
-            onClick={() => {
-              setSavedCount(getSavedQuotes().length);
-              setIsSavedQuotesOpen(true);
-            }}
-            title="Saved Quotes"
-          >
-            <Bookmark size={16} />
-          </button>
-
-          <button
-            className="btn-icon"
             onClick={() => setIsSettingsOpen(true)}
-            title="Settings &amp; Rules"
+            title="Settings &amp; Default Rules"
           >
             <Sliders size={16} />
           </button>
@@ -248,8 +152,6 @@ export default function Home() {
           inputs={inputs}
           result={result}
           onChange={handleInputsChange}
-          activeField={activeField}
-          onSelectField={handleSelectField}
           onOpenLadderPage={() => setCurrentTab('ladder')}
         />
       )}
@@ -274,12 +176,7 @@ export default function Home() {
         <div className="bar-inner" style={{ maxWidth: contentMaxWidth }}>
           <button className="btn-main" onClick={() => setIsShareOpen(true)}>
             <Share2 size={16} />
-            <span>Share Sheet</span>
-          </button>
-
-          <button className="btn-sub" onClick={() => setIsSavedQuotesOpen(true)}>
-            <Bookmark size={16} />
-            <span>Save</span>
+            <span>Share Cost Sheet</span>
           </button>
 
           <button
@@ -293,52 +190,6 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* On-Screen Numeric Keypad Drawer */}
-      {showKeypad && currentTab === 'costsheet' && (
-        <div className="keypad-drawer">
-          <div className="keypad-drawer-inner">
-            <div className="keypad-top-info">
-              <span className="keypad-target-name">{getActiveFieldTitle()}</span>
-              <button
-                className="btn-icon"
-                style={{ width: '28px', height: '28px', border: 'none' }}
-                onClick={() => setShowKeypad(false)}
-              >
-                <ChevronDown size={18} />
-              </button>
-            </div>
-
-            <div className="keypad-grid-3x4">
-              <button className="k-btn" onClick={() => handleKeypadPress('1')}>1</button>
-              <button className="k-btn" onClick={() => handleKeypadPress('2')}>2</button>
-              <button className="k-btn" onClick={() => handleKeypadPress('3')}>3</button>
-
-              <button className="k-btn" onClick={() => handleKeypadPress('4')}>4</button>
-              <button className="k-btn" onClick={() => handleKeypadPress('5')}>5</button>
-              <button className="k-btn" onClick={() => handleKeypadPress('6')}>6</button>
-
-              <button className="k-btn" onClick={() => handleKeypadPress('7')}>7</button>
-              <button className="k-btn" onClick={() => handleKeypadPress('8')}>8</button>
-              <button className="k-btn" onClick={() => handleKeypadPress('9')}>9</button>
-
-              <button className="k-btn k-btn-action" onClick={handleKeypadClear} style={{ color: '#e11d48' }}>
-                CLEAR
-              </button>
-              <button className="k-btn" onClick={() => handleKeypadPress('0')}>0</button>
-              <button className="k-btn" onClick={() => handleKeypadBackspace}>
-                <Delete size={18} />
-              </button>
-
-              <button className="k-btn k-btn-action" onClick={() => handleKeypadPress('00')}>00</button>
-              <button className="k-btn k-btn-action" onClick={() => handleKeypadPress('000')}>000</button>
-              <button className="k-btn k-btn-done" onClick={() => setShowKeypad(false)}>
-                <Check size={20} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Modals */}
       <ShareModal
         isOpen={isShareOpen}
@@ -348,17 +199,6 @@ export default function Home() {
         projectName={meta.projectName}
         unitNumber={meta.unitNumber}
         clientName={meta.clientName}
-      />
-
-      <SavedQuotesModal
-        isOpen={isSavedQuotesOpen}
-        onClose={() => {
-          setIsSavedQuotesOpen(false);
-          setSavedCount(getSavedQuotes().length);
-        }}
-        currentInputs={inputs}
-        currentResult={result}
-        onLoadQuote={handleLoadQuote}
       />
 
       <SettingsDrawer
