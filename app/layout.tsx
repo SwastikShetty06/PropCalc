@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'PropCalc - Real Estate Agreement Value Calculator',
-  description: 'Mobile offline property cost sheet and agreement value calculator with automated development charges, GST, stamp duty, parking, and instant WhatsApp export.',
+  title: 'Cost Sheet',
+  description: 'Residential property cost sheet and agreement value calculation.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
