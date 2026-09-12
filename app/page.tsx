@@ -43,7 +43,7 @@ type TabType = 'costsheet' | 'sheetal_sangam' | 'ladder' | 'documents';
 export default function Home() {
   const [inputs, setInputs] = useState<CalculationInputs>(DEFAULT_INPUTS);
   const [receivedDocs, setReceivedDocs] = useState<ReceivedDocument[]>([]);
-  const [currentTab, setCurrentTab] = useState<TabType>('sheetal_sangam'); // Default to Sheetal Sangam or Custom
+  const [currentTab, setCurrentTab] = useState<TabType>('sheetal_sangam');
   const [activeField, setActiveField] = useState<string | null>(null);
   const [showKeypad, setShowKeypad] = useState<boolean>(false);
 
@@ -162,14 +162,16 @@ export default function Home() {
     return 'Select an item to type';
   };
 
+  const contentMaxWidth = currentTab === 'sheetal_sangam' ? '780px' : '580px';
+
   return (
     <div className="page-container">
       {/* Top Header Bar */}
-      <header className="app-topbar" style={{ maxWidth: currentTab === 'sheetal_sangam' ? '780px' : '580px' }}>
+      <header className="app-topbar" style={{ maxWidth: contentMaxWidth }}>
         <div className="brand-title">
           <FileText size={18} />
           <span>PropCalc</span>
-          <span className="brand-badge">Offline</span>
+          <span className="brand-badge">PWA</span>
         </div>
 
         <div className="topbar-actions">
@@ -196,85 +198,40 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Menu Bar Tabs */}
-      <div
-        style={{
-          width: '100%',
-          maxWidth: currentTab === 'sheetal_sangam' ? '780px' : '580px',
-          display: 'flex',
-          gap: '4px',
-          marginBottom: '12px',
-          background: '#ffffff',
-          padding: '4px',
-          borderRadius: 'var(--radius-sm)',
-          border: '1px solid var(--border-light)',
-          overflowX: 'auto',
-        }}
-      >
+      {/* Tactile Tab Navigation Bar */}
+      <nav className="nav-tab-bar" style={{ maxWidth: contentMaxWidth }} aria-label="Page Navigation">
         <button
-          className={`btn-sub ${currentTab === 'sheetal_sangam' ? 'btn-main' : ''}`}
-          style={{
-            flex: 1,
-            padding: '8px 6px',
-            fontSize: '11px',
-            borderRadius: '4px',
-            border: currentTab === 'sheetal_sangam' ? 'none' : '1px solid transparent',
-            whiteSpace: 'nowrap',
-          }}
+          className={`nav-tab-btn ${currentTab === 'sheetal_sangam' ? 'active' : ''}`}
           onClick={() => setCurrentTab('sheetal_sangam')}
         >
-          <Building2 size={13} />
+          <Building2 size={14} />
           <span>Sheetal Sangam</span>
         </button>
 
         <button
-          className={`btn-sub ${currentTab === 'costsheet' ? 'btn-main' : ''}`}
-          style={{
-            flex: 1,
-            padding: '8px 6px',
-            fontSize: '11px',
-            borderRadius: '4px',
-            border: currentTab === 'costsheet' ? 'none' : '1px solid transparent',
-            whiteSpace: 'nowrap',
-          }}
+          className={`nav-tab-btn ${currentTab === 'costsheet' ? 'active' : ''}`}
           onClick={() => setCurrentTab('costsheet')}
         >
-          <TableIcon size={13} />
+          <TableIcon size={14} />
           <span>Custom Calc</span>
         </button>
 
         <button
-          className={`btn-sub ${currentTab === 'ladder' ? 'btn-main' : ''}`}
-          style={{
-            flex: 1,
-            padding: '8px 6px',
-            fontSize: '11px',
-            borderRadius: '4px',
-            border: currentTab === 'ladder' ? 'none' : '1px solid transparent',
-            whiteSpace: 'nowrap',
-          }}
+          className={`nav-tab-btn ${currentTab === 'ladder' ? 'active' : ''}`}
           onClick={() => setCurrentTab('ladder')}
         >
-          <TrendingUp size={13} />
+          <TrendingUp size={14} />
           <span>CP Ladder</span>
         </button>
 
         <button
-          className={`btn-sub ${currentTab === 'documents' ? 'btn-main' : ''}`}
-          style={{
-            flex: 1,
-            padding: '8px 6px',
-            fontSize: '11px',
-            borderRadius: '4px',
-            border: currentTab === 'documents' ? 'none' : '1px solid transparent',
-            whiteSpace: 'nowrap',
-          }}
+          className={`nav-tab-btn ${currentTab === 'documents' ? 'active' : ''}`}
           onClick={() => setCurrentTab('documents')}
         >
-          <FolderCheck size={13} />
+          <FolderCheck size={14} />
           <span>Documents</span>
         </button>
-      </div>
+      </nav>
 
       {/* Main Tab Views */}
       {currentTab === 'sheetal_sangam' && (
@@ -311,8 +268,8 @@ export default function Home() {
       )}
 
       {/* Sticky Bottom Action Bar */}
-      <div className="bottom-bar">
-        <div className="bar-inner" style={{ maxWidth: currentTab === 'sheetal_sangam' ? '780px' : '580px' }}>
+      <footer className="bottom-bar">
+        <div className="bar-inner" style={{ maxWidth: contentMaxWidth }}>
           <button className="btn-main" onClick={() => setIsShareOpen(true)}>
             <Share2 size={16} />
             <span>Share Sheet</span>
@@ -325,14 +282,14 @@ export default function Home() {
 
           <button
             className="btn-icon"
-            style={{ width: '42px', height: '42px' }}
+            style={{ width: '44px', height: '44px' }}
             onClick={handleResetToDefaults}
-            title="Reset"
+            title="Reset to Defaults"
           >
             <RotateCcw size={16} />
           </button>
         </div>
-      </div>
+      </footer>
 
       {/* On-Screen Numeric Keypad Drawer */}
       {showKeypad && currentTab === 'costsheet' && (
@@ -366,7 +323,7 @@ export default function Home() {
                 CLEAR
               </button>
               <button className="k-btn" onClick={() => handleKeypadPress('0')}>0</button>
-              <button className="k-btn k-btn-action" onClick={handleKeypadBackspace}>
+              <button className="k-btn" onClick={() => handleKeypadBackspace}>
                 <Delete size={18} />
               </button>
 
