@@ -1,4 +1,42 @@
-import { CalculationInputs, CalculationResult, CostBreakdownItem, BrokerageLadderTier } from './types';
+import {
+  CalculationInputs,
+  CalculationResult,
+  CostBreakdownItem,
+  BrokerageLadderTier,
+  SheetalPaymentScheme,
+  SheetalUnitConfig,
+  SheetalCostBreakdown,
+} from './types';
+
+export const SHEETAL_SANGAM_UNITS: SheetalUnitConfig[] = [
+  {
+    id: 'unit_585',
+    carpetArea: 585,
+    bhkLabel: '2 BHK (Compact)',
+    rates: {
+      CLP: 30500,
+      '30_70': 32500,
+    },
+  },
+  {
+    id: 'unit_690',
+    carpetArea: 690,
+    bhkLabel: '2 BHK (Spacious)',
+    rates: {
+      CLP: 30500,
+      '30_70': 32500,
+    },
+  },
+  {
+    id: 'unit_710',
+    carpetArea: 710,
+    bhkLabel: '3 BHK (Premium)',
+    rates: {
+      CLP: 30500,
+      '30_70': 32500,
+    },
+  },
+];
 
 export const BROKERAGE_LADDER_TIERS: BrokerageLadderTier[] = [
   {
@@ -44,6 +82,8 @@ export const DEFAULT_INPUTS: CalculationInputs = {
   ratePerSqFt: 25000,
   gstPercent: 12,
   stampDutyPercent: 6,
+  regCharges: 30000,
+  legalCharges: 20000,
   regLegalCharges: 50000,
   carParkingSlots: 1,
   carParkingCostPerSlot: 1200000,
@@ -52,7 +92,7 @@ export const DEFAULT_INPUTS: CalculationInputs = {
   devChargesThreshold: 700,
   devChargesFlatRate: 555000,
   devChargesPsfRate: 800,
-  brokeragePercent: 3.5, // Default 3.5%
+  brokeragePercent: 3.5,
   cumulativeSoldSqFt: 668,
 };
 
@@ -184,7 +224,7 @@ export function calculateAll(inputs: CalculationInputs): CalculationResult {
   // 1. Agreement Value (AGV)
   const agreementValue = Math.round(carpetArea * ratePerSqFt);
   
-  // 2. GST (e.g. 12%)
+  // 2. GST (e.g. 12% or 5%)
   const gstPercent = Number(inputs.gstPercent) || 0;
   const gstAmount = Math.round(agreementValue * (gstPercent / 100));
   
@@ -306,5 +346,95 @@ export function calculateAll(inputs: CalculationInputs): CalculationResult {
     brokerageAmount,
     brokerageInWords: numberToIndianWords(brokerageAmount),
     applicableTier,
+  };
+}
+
+/**
+ * Dedicated calculation helper for Sheetal Sangam Residential Project
+ */
+export function calculateSheetalCost(
+  carpetArea: number,
+  scheme: SheetalPaymentScheme = 'CLP',
+  customRate?: number,
+  customParking: number = 1200000,
+  customDevCharges: number = 555000,
+  brokeragePercent: number = 3.5
+): SheetalCostBreakdown {
+  const baseRate = customRate ?? (scheme === 'CLP' ? 30500 : 32500);
+  const agreementValue = Math.round(carpetArea * baseRate);
+  
+  const stampDutyPercent = 6;
+  const stampDutyAmount = Math.round(agreementValue * 0.06);
+  
+  const registrationAmount = 30000;
+  const legalChargesAmount = 20000;
+  
+  const gstPercent = 5;
+  const gstAmount = Math.round(agreementValue * 0.05);
+  
+  const carParkingAmount = customParking;
+  const devChargesAmount = customDevCharges;
+  
+  const grandTotal = agreementValue + stampDutyAmount + registrationAmount + legalChargesAmount + gstAmount + carParkingAmount + devChargesAmount;
+
+  // Payment Schedule
+  let schedule: SheetalCostBreakdown['schedule'];
+  if (scheme === 'CLP') {
+    const nowPercent = 10;
+    const nowAmount = Math.round(agreementValue * 0.10);
+    const nowGst = Math.round(nowAmount * 0.05);
+    const nowTotal = nowAmount + nowGst;
+    schedule = {
+      nowPercent,
+      nowAmount,
+      nowGst,
+      nowTotal,
+      notes: 'Rest as per Construction Linked Plan (CLP)',
+    };
+  } else {
+    // 30:70 Scheme
+    const nowPercent = 30;
+    const nowAmount = Math.round(agreementValue * 0.30);
+    const nowGst = Math.round(nowAmount * 0.05);
+    const nowTotal = nowAmount + nowGst;
+    
+    const possessionPercent = 70;
+    const possessionAmount = Math.round(agreementValue * 0.70);
+    const possessionGst = Math.round(possessionAmount * 0.05);
+    const possessionTotal = possessionAmount + possessionGst;
+    
+    schedule = {
+      nowPercent,
+      nowAmount,
+      nowGst,
+      nowTotal,
+      possessionPercent,
+      possessionAmount,
+      possessionGst,
+      possessionTotal,
+      notes: '30% Now booking & 70% on Possession milestone',
+    };
+  }
+
+  const brokerageAmount = Math.round(agreementValue * (brokeragePercent / 100));
+
+  return {
+    carpetArea,
+    ratePerSqFt: baseRate,
+    scheme,
+    agreementValue,
+    stampDutyPercent,
+    stampDutyAmount,
+    registrationAmount,
+    legalChargesAmount,
+    gstPercent,
+    gstAmount,
+    carParkingAmount,
+    devChargesAmount,
+    grandTotal,
+    amountInWords: numberToIndianWords(grandTotal),
+    schedule,
+    brokeragePercent,
+    brokerageAmount,
   };
 }

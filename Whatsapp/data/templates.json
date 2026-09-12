@@ -1,0 +1,137 @@
+[
+  {
+    "id": "tpl-1788171024301-642f6ff8",
+    "name": "Copy of Ethnic Wear Catalog & Price List",
+    "description": "",
+    "category": "Custom",
+    "createdAt": "2026-08-31T10:10:24.301Z",
+    "updatedAt": "2026-08-31T10:10:24.301Z",
+    "steps": [
+      {
+        "type": "text",
+        "caption": "",
+        "delayMs": 2500,
+        "fileName": "",
+        "filePath": "",
+        "content": "✨ Namaste & Welcome to Our Ethnic Wear Collection! ✨\n\nWe are delighted to share our exclusive handcrafted ethnic wear & festive designs with you."
+      },
+      {
+        "type": "pdf",
+        "caption": "📖 Exclusive Festive & Ethnic Wear Catalog 2026",
+        "delayMs": 3000,
+        "fileName": "Ethnic_Wear_Catalog_2026.pdf",
+        "filePath": "./uploads/templates/sample_ethnic_catalog.pdf"
+      },
+      {
+        "type": "image",
+        "caption": "🌟 Top Trending Festive Look of the Month",
+        "delayMs": 2000,
+        "fileName": "trending_ethnic_look.jpg",
+        "filePath": ""
+      },
+      {
+        "type": "text",
+        "caption": "",
+        "delayMs": 0,
+        "fileName": "",
+        "filePath": "",
+        "content": "To place an order or customize your outfit, simply reply with the Item Code from the catalog. Free shipping across India! 🚚📦"
+      }
+    ]
+  },
+  {
+    "id": "ethnic-collection",
+    "name": "Ethnic Wear Catalog & Price List",
+    "description": "Promote new ethnic wear collections with greetings, PDF catalog, and ordering steps.",
+    "category": "Ethnic Fashion",
+    "createdAt": "2026-08-31T10:07:20.199Z",
+    "steps": [
+      {
+        "type": "text",
+        "content": "✨ Namaste & Welcome to Our Ethnic Wear Collection! ✨\n\nWe are delighted to share our exclusive handcrafted ethnic wear & festive designs with you.",
+        "delayMs": 2500,
+        "caption": ""
+      },
+      {
+        "type": "pdf",
+        "content": "",
+        "caption": "📖 Exclusive Festive & Ethnic Wear Catalog 2026",
+        "delayMs": 3000,
+        "fileName": "Ethnic_Wear_Catalog_2026.pdf",
+        "filePath": "./uploads/templates/sample_ethnic_catalog.pdf"
+      },
+      {
+        "type": "image",
+        "content": "",
+        "caption": "🌟 Top Trending Festive Look of the Month",
+        "delayMs": 2000,
+        "fileName": "trending_ethnic_look.jpg",
+        "filePath": ""
+      },
+      {
+        "type": "text",
+        "content": "To place an order or customize your outfit, simply reply with the Item Code from the catalog. Free shipping across India! 🚚📦",
+        "delayMs": 0,
+        "caption": ""
+      }
+    ]
+  },
+  {
+    "id": "welcome-brochure",
+    "name": "Welcome & Corporate Brochure",
+    "description": "Send a warm greeting and company overview PDF to new inquiries.",
+    "category": "General",
+    "createdAt": "2026-08-31T10:07:20.205Z",
+    "steps": [
+      {
+        "type": "text",
+        "content": "Hello! Thank you for getting in touch with us.\n\nPlease find our company brochure attached below for your review.",
+        "delayMs": 2500,
+        "caption": ""
+      },
+      {
+        "type": "pdf",
+        "content": "",
+        "caption": "Company Overview & Services Brochure",
+        "delayMs": 2000,
+        "fileName": "Company_Brochure.pdf",
+        "filePath": ""
+      },
+      {
+        "type": "text",
+        "content": "Feel free to reply if you have any questions or would like to schedule a call!",
+        "delayMs": 0,
+        "caption": ""
+      }
+    ]
+  },
+  {
+    "id": "invoice-receipt",
+    "name": "Invoice & Payment Receipt",
+    "description": "Deliver billing statements and payment acknowledgment documents.",
+    "category": "Billing",
+    "createdAt": "2026-08-31T10:07:20.205Z",
+    "steps": [
+      {
+        "type": "text",
+        "content": "Hi there! Your requested monthly billing statement and invoice are ready.",
+        "delayMs": 2000,
+        "caption": ""
+      },
+      {
+        "type": "pdf",
+        "content": "",
+        "caption": "Official Tax Invoice",
+        "delayMs": 3000,
+        "fileName": "Tax_Invoice.pdf",
+        "filePath": ""
+      },
+      {
+        "type": "text",
+        "content": "Thank you for your business! Please reach out if you have any billing inquiries.",
+        "delayMs": 0,
+        "caption": ""
+      }
+    ]
+  }
+]

@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Multi-Item Sequence Sender</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eefdf3',
+              100: '#d6fae2',
+              400: '#38e178',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    .pulse-glow {
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+    }
+  </style>
+</head>
+<body class="min-h-full flex flex-col font-sans bg-slate-950 selection:bg-brand-500 selection:text-black">
+
+  <!-- Navigation Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-brand-500/20">
+          <i class="fa-brands fa-whatsapp text-2xl text-slate-950"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            WhatsApp Multi-Item Sender
+            <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-400 border border-brand-500/20">v1.1</span>
+          </h1>
+          <p class="text-xs text-slate-400">Multi-device automation engine with reusable sequence templates</p>
+        </div>
+      </div>
+
+      <!-- Quick status indicator & actions in header -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div id="headerStatusBadge" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 text-xs font-medium text-slate-300">
+          <span class="w-2 h-2 rounded-full bg-yellow-400 animate-ping"></span>
+          <span id="headerStatusText">Checking Status...</span>
+        </div>
+        <button id="btnRestartClient" title="Restart WhatsApp Client" class="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span class="hidden sm:inline">Restart</span>
+        </button>
+        <button id="btnClearSession" title="Reset Session & Get Fresh QR" class="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-800/50 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-power-off"></i>
+          <span class="hidden sm:inline">Reset Session</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Top Connection Status & QR Code Banner -->
+    <section id="connectionBanner" class="relative rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900/90 to-slate-900/40 p-5 overflow-hidden">
+      <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5">
+        
+        <!-- Status Text & Details -->
+        <div class="flex items-start gap-4">
+          <div id="statusIconBox" class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xl text-yellow-400 shrink-0">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 id="statusTitle" class="text-base font-semibold text-white">Initializing WhatsApp Client...</h2>
+              <span id="statusPill" class="text-[11px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
+                INITIALIZING
+              </span>
+            </div>
+            <p id="statusDescription" class="text-xs text-slate-400 mt-1">
+              Starting local Chromium instance and loading multi-device session...
+            </p>
+            <div id="connectedAccountInfo" class="hidden mt-2 text-xs font-medium text-emerald-400 flex flex-wrap items-center gap-3">
+              <span><i class="fa-solid fa-user-check mr-1"></i> <span id="accountPushName">User</span></span>
+              <span><i class="fa-solid fa-phone mr-1"></i> +<span id="accountPhoneNumber">--</span></span>
+              <span><i class="fa-solid fa-shield-halved mr-1"></i> LocalAuth Persistent</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- QR Display Section (When QR is available) -->
+        <div id="qrContainer" class="hidden flex flex-col sm:flex-row items-center gap-4 bg-slate-950/90 p-4 rounded-xl border border-slate-700 shadow-xl self-center lg:self-auto">
+          <div class="relative bg-white p-2.5 rounded-xl shadow-lg">
+            <img id="qrCodeImage" src="" alt="WhatsApp QR Code" class="w-40 h-40 object-contain rounded-lg" />
+            <div id="qrLoadingOverlay" class="absolute inset-0 bg-white/90 backdrop-blur-xs flex flex-col items-center justify-center hidden rounded-xl">
+              <i class="fa-solid fa-spinner fa-spin text-slate-800 text-2xl"></i>
+              <span class="text-[11px] font-semibold text-slate-700 mt-1">Refreshing QR...</span>
+            </div>
+          </div>
+          <div class="text-xs space-y-2 max-w-xs text-slate-300">
+            <div class="flex items-center justify-between">
+              <p class="font-bold text-white flex items-center gap-1.5 text-emerald-400">
+                <i class="fa-solid fa-qrcode"></i> Scan with WhatsApp
+              </p>
+              <button onclick="fetchQRCode(true)" class="text-[10px] text-slate-400 hover:text-white px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 transition">
+                <i class="fa-solid fa-rotate-right mr-1"></i> Refresh
+              </button>
+            </div>
+            <ol class="list-decimal list-inside space-y-1 text-slate-400 text-[11px]">
+              <li>Open WhatsApp on your phone</li>
+              <li>Go to <b class="text-slate-200">Settings / Menu</b> &rarr; <b class="text-slate-200">Linked Devices</b></li>
+              <li>Tap <b class="text-slate-200">Link a Device</b> & scan this code</li>
+            </ol>
+            <div class="pt-1 flex items-center justify-between text-[10px] text-slate-500">
+              <span><i class="fa-solid fa-shield-check mr-1 text-brand-400"></i> Auto-saved locally</span>
+              <button onclick="clearSessionAndReset()" class="text-red-400 hover:underline">Trouble scanning? Reset</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Main Workspace Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Left Column: Sequence Builder & Saved Templates (7 cols) -->
+      <section class="lg:col-span-7 space-y-5">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur p-5 space-y-5">
+          
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <h2 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-brand-400"></i>
+                Sequence Builder
+              </h2>
+              <p class="text-xs text-slate-400">Compose multi-item dispatches or reuse saved templates with pre-attached PDFs</p>
+            </div>
+            <span id="stepCountBadge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+              0 Steps
+            </span>
+          </div>
+
+          <!-- Recipient Form Field -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              Recipient Phone Number <span class="text-red-400">*</span>
+            </label>
+            <div class="relative flex rounded-xl shadow-sm">
+              <span class="inline-flex items-center px-3.5 rounded-l-xl border border-r-0 border-slate-700 bg-slate-800/80 text-slate-400 text-xs font-medium">
+                <i class="fa-solid fa-mobile-screen mr-1.5"></i> +
+              </span>
+              <input
+                type="text"
+                id="recipientNumber"
+                placeholder="919876543210 (Country code + digits, e.g. 919876543210 for India)"
+                class="flex-1 min-w-0 block w-full px-3 py-2.5 text-sm bg-slate-950 border border-slate-700 text-white placeholder-slate-500 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none"
+              />
+              <button
+                type="button"
+                id="btnVerifyRecipient"
+                class="inline-flex items-center px-3.5 rounded-r-xl border border-l-0 border-slate-700 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium transition"
+              >
+                <span>Check User</span>
+              </button>
+            </div>
+            <p id="recipientValidationMsg" class="text-[11px] text-slate-500">Enter full phone number with international country code (e.g. 91 for India, 1 for USA/Canada).</p>
+          </div>
+
+          <!-- SAVED TEMPLATES MANAGER SECTION -->
+          <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-purple-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-bookmark text-purple-400"></i> My Saved Templates
+              </span>
+              <div class="flex items-center gap-2">
+                <button
+                  type="button"
+                  onclick="openSaveTemplateModal()"
+                  class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 transition flex items-center gap-1"
+                >
+                  <i class="fa-solid fa-floppy-disk"></i> Save Current as Template
+                </button>
+              </div>
+            </div>
+
+            <!-- Dynamic Templates Chips -->
+            <div id="templatesChipsContainer" class="flex flex-wrap gap-2 pt-1">
+              <!-- Dynamically populated from /api/templates -->
+            </div>
+          </div>
+
+          <!-- Active Template Banner (If loaded) -->
+          <div id="activeTemplateBanner" class="hidden flex items-center justify-between p-2.5 rounded-lg bg-brand-950/40 border border-brand-500/30 text-xs text-brand-300">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-circle-check text-emerald-400"></i>
+              <span>Active Template: <b id="activeTemplateName" class="text-white">Ethnic Wear Catalog</b></span>
+            </div>
+            <button onclick="unloadActiveTemplate()" class="text-slate-400 hover:text-white text-xs">
+              <i class="fa-solid fa-xmark"></i> Clear
+            </button>
+          </div>
+
+          <!-- Sequence Steps Container -->
+          <div class="space-y-3 pt-1">
+            <div class="flex items-center justify-between">
+              <label class="text-xs font-semibold uppercase tracking-wider text-slate-300">
+                Sequence Steps (Executed in Strict Order)
+              </label>
+              <button type="button" onclick="clearAllSteps()" class="text-[11px] text-red-400 hover:text-red-300 transition">
+                Clear All Steps
+              </button>
+            </div>
+
+            <div id="stepsList" class="space-y-3">
+              <!-- Dynamically populated step cards -->
+            </div>
+
+            <!-- Empty Steps Placeholder -->
+            <div id="emptyStepsPlaceholder" class="border-2 border-dashed border-slate-800 rounded-xl p-8 text-center space-y-2">
+              <div class="w-10 h-10 rounded-full bg-slate-800/80 flex items-center justify-center text-slate-500 mx-auto">
+                <i class="fa-solid fa-plus text-lg"></i>
+              </div>
+              <h3 class="text-xs font-semibold text-slate-300">No steps in sequence yet</h3>
+              <p class="text-[11px] text-slate-500">Click a saved template above or add custom steps below.</p>
+            </div>
+
+            <!-- Add Step Buttons -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2">
+              <button
+                type="button"
+                onclick="addStep('text')"
+                class="px-3 py-2 text-xs font-medium rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 transition flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <i class="fa-solid fa-comment-dots text-emerald-400"></i>
+                <span>+ Text Message</span>
+              </button>
+              <button
+                type="button"
+                onclick="addStep('pdf')"
+                class="px-3 py-2 text-xs font-medium rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 transition flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <i class="fa-solid fa-file-pdf text-red-400"></i>
+                <span>+ PDF Doc</span>
+              </button>
+              <button
+                type="button"
+                onclick="addStep('image')"
+                class="px-3 py-2 text-xs font-medium rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 transition flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <i class="fa-solid fa-image text-blue-400"></i>
+                <span>+ Image</span>
+              </button>
+              <button
+                type="button"
+                onclick="addStep('video')"
+                class="px-3 py-2 text-xs font-medium rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-slate-200 transition flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <i class="fa-solid fa-video text-purple-400"></i>
+                <span>+ Video</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-4 border-t border-slate-800">
+            <button
+              id="btnSendSequence"
+              type="button"
+              onclick="submitSequence()"
+              class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-sm shadow-lg shadow-brand-500/20 hover:shadow-brand-500/30 transition duration-150 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <i class="fa-solid fa-paper-plane"></i>
+              <span id="btnSendText">Send Sequence Now</span>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Right Column: Real-Time Execution Monitor & Live Logs (5 cols) -->
+      <section class="lg:col-span-5 space-y-5">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/60 backdrop-blur p-5 space-y-4 flex flex-col h-full min-h-[560px]">
+          
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <h2 class="text-base font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-terminal text-emerald-400"></i>
+                Live Execution Console
+              </h2>
+              <p class="text-xs text-slate-400">Real-time status, delay countdowns & progress logs</p>
+            </div>
+            <button onclick="clearLogs()" class="text-slate-500 hover:text-slate-300 text-xs transition" title="Clear console">
+              <i class="fa-solid fa-eraser"></i>
+            </button>
+          </div>
+
+          <!-- Active Job Progress Status Card -->
+          <div id="activeJobCard" class="p-3.5 rounded-xl bg-slate-950 border border-slate-800 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <span id="jobPulse" class="w-2 h-2 rounded-full bg-slate-600"></span>
+                <span id="jobStatusText">No active sequence running</span>
+              </span>
+              <span id="jobProgressText" class="text-xs font-mono font-bold text-slate-400">0%</span>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+              <div id="jobProgressBar" class="bg-gradient-to-r from-brand-500 to-emerald-400 h-full w-0 transition-all duration-300"></div>
+            </div>
+
+            <!-- Delay countdown badge -->
+            <div id="delayCountdownBox" class="hidden flex items-center justify-between p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs">
+              <span class="flex items-center gap-1.5">
+                <i class="fa-solid fa-hourglass-half fa-spin"></i>
+                <span>Enforcing Delay:</span>
+              </span>
+              <span id="delayCountdownVal" class="font-mono font-bold">2000ms</span>
+            </div>
+          </div>
+
+          <!-- Log Console Stream -->
+          <div class="flex-1 flex flex-col min-h-[300px]">
+            <div class="flex items-center justify-between pb-1.5">
+              <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Engine Log Stream</span>
+              <span id="logEntryCount" class="text-[10px] font-mono text-slate-500">0 events</span>
+            </div>
+            <div
+              id="logConsole"
+              class="flex-1 bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-xs overflow-y-auto space-y-1.5 max-h-[380px]"
+            >
+              <div class="text-slate-600 italic text-[11px]">System ready. Logs will appear here when a sequence starts...</div>
+            </div>
+          </div>
+
+          <!-- Recent Sequence Jobs Summary -->
+          <div class="pt-2 border-t border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Recent Dispatches</span>
+              <button onclick="loadRecentJobs()" class="text-[11px] text-brand-400 hover:underline">Refresh</button>
+            </div>
+            <div id="recentJobsList" class="space-y-1.5 max-h-32 overflow-y-auto">
+              <div class="text-[11px] text-slate-600 italic">No previous jobs recorded this session.</div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- SAVE TEMPLATE MODAL -->
+  <div id="saveTemplateModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-base font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-bookmark text-purple-400"></i> Save Sequence as Template
+        </h3>
+        <button onclick="closeSaveTemplateModal()" class="text-slate-400 hover:text-white text-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 uppercase tracking-wider mb-1">Template Name <span class="text-red-400">*</span></label>
+          <input
+            type="text"
+            id="tplModalName"
+            placeholder="e.g., Festive Ethnic Wear Collection 2026"
+            class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-purple-500 outline-none"
+          />
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 uppercase tracking-wider mb-1">Category / Tag</label>
+          <input
+            type="text"
+            id="tplModalCategory"
+            placeholder="e.g., Ethnic Wear, Marketing, Billing"
+            class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-purple-500 outline-none"
+          />
+        </div>
+        <div>
+          <label class="block font-semibold text-slate-300 uppercase tracking-wider mb-1">Description (Optional)</label>
+          <textarea
+            id="tplModalDesc"
+            rows="2"
+            placeholder="Notes about when to use this template..."
+            class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-purple-500 outline-none"
+          ></textarea>
+        </div>
+        <p class="text-[11px] text-slate-400 bg-purple-950/30 p-2.5 rounded-lg border border-purple-500/20">
+          💡 Any attached PDF documents or media files will be saved on the server and automatically reused whenever you select this template!
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+        <button type="button" onclick="closeSaveTemplateModal()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+          Cancel
+        </button>
+        <button type="button" onclick="saveCurrentTemplate()" class="px-4 py-2 text-xs font-bold rounded-lg bg-purple-600 hover:bg-purple-500 text-white transition flex items-center gap-1.5 shadow-lg shadow-purple-600/30">
+          <i class="fa-solid fa-check"></i> Save Template
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-900 py-4 bg-slate-950 text-center text-xs text-slate-600">
+    WhatsApp Multi-Item Synchronous Sender &bull; Built with Node.js, Express & whatsapp-web.js
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

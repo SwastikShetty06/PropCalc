@@ -15,6 +15,7 @@ import {
   getReceivedDocuments,
 } from '@/lib/storage';
 import { TableCalculator } from '@/components/TableCalculator';
+import { SheetalSangamPage } from '@/components/SheetalSangamPage';
 import { BrokerageLadderPage } from '@/components/BrokerageLadderPage';
 import { ReceivedDocsPage } from '@/components/ReceivedDocsPage';
 import { ShareModal } from '@/components/ShareModal';
@@ -23,6 +24,7 @@ import { SettingsDrawer } from '@/components/SettingsDrawer';
 import { ServiceWorkerManager } from './sw-register';
 import {
   Table as TableIcon,
+  Building2,
   TrendingUp,
   FolderCheck,
   Share2,
@@ -32,15 +34,16 @@ import {
   Delete,
   Check,
   ChevronDown,
-  FileText
+  FileText,
+  Sparkles
 } from 'lucide-react';
 
-type TabType = 'costsheet' | 'ladder' | 'documents';
+type TabType = 'costsheet' | 'sheetal_sangam' | 'ladder' | 'documents';
 
 export default function Home() {
   const [inputs, setInputs] = useState<CalculationInputs>(DEFAULT_INPUTS);
   const [receivedDocs, setReceivedDocs] = useState<ReceivedDocument[]>([]);
-  const [currentTab, setCurrentTab] = useState<TabType>('costsheet');
+  const [currentTab, setCurrentTab] = useState<TabType>('sheetal_sangam'); // Default to Sheetal Sangam or Custom
   const [activeField, setActiveField] = useState<string | null>(null);
   const [showKeypad, setShowKeypad] = useState<boolean>(false);
 
@@ -51,7 +54,7 @@ export default function Home() {
 
   // Metadata
   const [meta, setMeta] = useState({
-    projectName: '',
+    projectName: 'Sheetal Sangam',
     unitNumber: '',
     clientName: '',
   });
@@ -88,6 +91,13 @@ export default function Home() {
         clientName: loadedMeta.clientName || '',
       });
     }
+  };
+
+  const handleLoadSheetalUnit = (customInputs: CalculationInputs, projectName: string) => {
+    setInputs(customInputs);
+    saveLastInputs(customInputs);
+    setMeta({ ...meta, projectName });
+    setCurrentTab('costsheet');
   };
 
   const result: CalculationResult = useMemo(() => {
@@ -155,7 +165,7 @@ export default function Home() {
   return (
     <div className="page-container">
       {/* Top Header Bar */}
-      <header className="app-topbar">
+      <header className="app-topbar" style={{ maxWidth: currentTab === 'sheetal_sangam' ? '780px' : '580px' }}>
         <div className="brand-title">
           <FileText size={18} />
           <span>PropCalc</span>
@@ -190,43 +200,62 @@ export default function Home() {
       <div
         style={{
           width: '100%',
-          maxWidth: '580px',
+          maxWidth: currentTab === 'sheetal_sangam' ? '780px' : '580px',
           display: 'flex',
-          gap: '6px',
+          gap: '4px',
           marginBottom: '12px',
           background: '#ffffff',
           padding: '4px',
           borderRadius: 'var(--radius-sm)',
           border: '1px solid var(--border-light)',
+          overflowX: 'auto',
         }}
       >
+        <button
+          className={`btn-sub ${currentTab === 'sheetal_sangam' ? 'btn-main' : ''}`}
+          style={{
+            flex: 1,
+            padding: '8px 6px',
+            fontSize: '11px',
+            borderRadius: '4px',
+            border: currentTab === 'sheetal_sangam' ? 'none' : '1px solid transparent',
+            whiteSpace: 'nowrap',
+          }}
+          onClick={() => setCurrentTab('sheetal_sangam')}
+        >
+          <Building2 size={13} />
+          <span>Sheetal Sangam</span>
+        </button>
+
         <button
           className={`btn-sub ${currentTab === 'costsheet' ? 'btn-main' : ''}`}
           style={{
             flex: 1,
-            padding: '8px 10px',
-            fontSize: '12px',
+            padding: '8px 6px',
+            fontSize: '11px',
             borderRadius: '4px',
             border: currentTab === 'costsheet' ? 'none' : '1px solid transparent',
+            whiteSpace: 'nowrap',
           }}
           onClick={() => setCurrentTab('costsheet')}
         >
-          <TableIcon size={14} />
-          <span>Cost Sheet</span>
+          <TableIcon size={13} />
+          <span>Custom Calc</span>
         </button>
 
         <button
           className={`btn-sub ${currentTab === 'ladder' ? 'btn-main' : ''}`}
           style={{
             flex: 1,
-            padding: '8px 10px',
-            fontSize: '12px',
+            padding: '8px 6px',
+            fontSize: '11px',
             borderRadius: '4px',
             border: currentTab === 'ladder' ? 'none' : '1px solid transparent',
+            whiteSpace: 'nowrap',
           }}
           onClick={() => setCurrentTab('ladder')}
         >
-          <TrendingUp size={14} />
+          <TrendingUp size={13} />
           <span>CP Ladder</span>
         </button>
 
@@ -234,19 +263,27 @@ export default function Home() {
           className={`btn-sub ${currentTab === 'documents' ? 'btn-main' : ''}`}
           style={{
             flex: 1,
-            padding: '8px 10px',
-            fontSize: '12px',
+            padding: '8px 6px',
+            fontSize: '11px',
             borderRadius: '4px',
             border: currentTab === 'documents' ? 'none' : '1px solid transparent',
+            whiteSpace: 'nowrap',
           }}
           onClick={() => setCurrentTab('documents')}
         >
-          <FolderCheck size={14} />
+          <FolderCheck size={13} />
           <span>Documents</span>
         </button>
       </div>
 
       {/* Main Tab Views */}
+      {currentTab === 'sheetal_sangam' && (
+        <SheetalSangamPage
+          onLoadIntoCustomCalculator={handleLoadSheetalUnit}
+          onOpenShareModal={() => setIsShareOpen(true)}
+        />
+      )}
+
       {currentTab === 'costsheet' && (
         <TableCalculator
           inputs={inputs}
@@ -275,7 +312,7 @@ export default function Home() {
 
       {/* Sticky Bottom Action Bar */}
       <div className="bottom-bar">
-        <div className="bar-inner">
+        <div className="bar-inner" style={{ maxWidth: currentTab === 'sheetal_sangam' ? '780px' : '580px' }}>
           <button className="btn-main" onClick={() => setIsShareOpen(true)}>
             <Share2 size={16} />
             <span>Share Sheet</span>

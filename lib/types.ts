@@ -3,7 +3,9 @@ export interface CalculationInputs {
   ratePerSqFt: number;
   gstPercent: number;
   stampDutyPercent: number;
-  regLegalCharges: number;
+  regCharges?: number;        // e.g. 30000
+  legalCharges?: number;      // e.g. 20000
+  regLegalCharges: number;    // combined 50000
   carParkingSlots: number;
   carParkingCostPerSlot: number;
   carParkingCustomAmount: number | null;
@@ -17,6 +19,52 @@ export interface CalculationInputs {
   // Brokerage configuration (Calculated strictly on AGV)
   brokeragePercent: number;    // default 3.5%
   cumulativeSoldSqFt?: number; // for ladder tier detection
+}
+
+export type SheetalPaymentScheme = 'CLP' | '30_70';
+
+export interface SheetalUnitConfig {
+  id: string;
+  carpetArea: number;
+  bhkLabel: string;
+  rates: {
+    CLP: number;    // 30,500
+    '30_70': number; // 32,500
+  };
+}
+
+export interface SheetalCostBreakdown {
+  carpetArea: number;
+  ratePerSqFt: number;
+  scheme: SheetalPaymentScheme;
+  agreementValue: number;
+  stampDutyPercent: number;
+  stampDutyAmount: number;
+  registrationAmount: number;
+  legalChargesAmount: number;
+  gstPercent: number;
+  gstAmount: number;
+  carParkingAmount: number;
+  devChargesAmount: number;
+  grandTotal: number;
+  amountInWords: string;
+  
+  // Payment schedule breakdown
+  schedule: {
+    nowPercent: number;
+    nowAmount: number;
+    nowGst: number;
+    nowTotal: number;
+    possessionPercent?: number;
+    possessionAmount?: number;
+    possessionGst?: number;
+    possessionTotal?: number;
+    notes: string;
+  };
+  
+  // CP Brokerage on AGV
+  brokeragePercent: number;
+  brokerageAmount: number;
 }
 
 export interface BrokerageLadderTier {
@@ -71,6 +119,7 @@ export interface SavedQuote {
   clientName?: string;
   clientPhone?: string;
   cpName?: string;
+  scheme?: string;
   inputs: CalculationInputs;
   result: CalculationResult;
   notes?: string;
