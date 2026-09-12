@@ -35,10 +35,12 @@ import {
   Check,
   ChevronDown,
   FileText,
-  Sparkles
 } from 'lucide-react';
 
-type TabType = 'costsheet' | 'sheetal_sangam' | 'ladder' | 'documents';
+/* Hallmark · genre: modern-minimal · macrostructure: workbench · theme: cobalt · enrichment: live-interactive · nav: n5 · footer: ft2 */
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V5 */
+
+type TabType = 'sheetal_sangam' | 'costsheet' | 'ladder' | 'documents';
 
 export default function Home() {
   const [inputs, setInputs] = useState<CalculationInputs>(DEFAULT_INPUTS);
@@ -75,7 +77,7 @@ export default function Home() {
   const handleResetToDefaults = () => {
     setInputs(DEFAULT_INPUTS);
     saveLastInputs(DEFAULT_INPUTS);
-    setMeta({ projectName: '', unitNumber: '', clientName: '' });
+    setMeta({ projectName: 'Sheetal Sangam', unitNumber: '', clientName: '' });
   };
 
   const handleLoadQuote = (
@@ -86,7 +88,7 @@ export default function Home() {
     saveLastInputs(loadedInputs);
     if (loadedMeta) {
       setMeta({
-        projectName: loadedMeta.projectName || '',
+        projectName: loadedMeta.projectName || 'Sheetal Sangam',
         unitNumber: loadedMeta.unitNumber || '',
         clientName: loadedMeta.clientName || '',
       });
@@ -171,7 +173,7 @@ export default function Home() {
         <div className="brand-title">
           <FileText size={18} />
           <span>PropCalc</span>
-          <span className="brand-badge">PWA</span>
+          <span className="brand-badge">Offline PWA</span>
         </div>
 
         <div className="topbar-actions">
@@ -198,7 +200,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Tactile Tab Navigation Bar */}
+      {/* Modern-Minimal Tactile Navigation Tabs */}
       <nav className="nav-tab-bar" style={{ maxWidth: contentMaxWidth }} aria-label="Page Navigation">
         <button
           className={`nav-tab-btn ${currentTab === 'sheetal_sangam' ? 'active' : ''}`}
