@@ -19,6 +19,7 @@ import { BrokerageLadderPage } from '@/components/BrokerageLadderPage';
 import { ReceivedDocsPage } from '@/components/ReceivedDocsPage';
 import { ShareModal } from '@/components/ShareModal';
 import { SettingsDrawer } from '@/components/SettingsDrawer';
+import { PrintTemplate } from '@/components/PrintTemplate';
 import { ServiceWorkerManager } from './sw-register';
 import {
   Table as TableIcon,
@@ -82,132 +83,144 @@ export default function Home() {
   const contentMaxWidth = currentTab === 'sheetal_sangam' ? '780px' : '580px';
 
   return (
-    <div className="page-container">
-      {/* Top Header Bar */}
-      <header className="app-topbar" style={{ maxWidth: contentMaxWidth }}>
-        <div className="brand-title">
-          <FileText size={18} />
-          <span>PropCalc</span>
-          <span className="brand-badge">Offline PWA</span>
-        </div>
+    <>
+      {/* ── Screen Page Layout ── */}
+      <div className="page-container">
+        {/* Top Header Bar */}
+        <header className="app-topbar" style={{ maxWidth: contentMaxWidth }}>
+          <div className="brand-title">
+            <FileText size={18} />
+            <span>PropCalc</span>
+            <span className="brand-badge">Offline PWA</span>
+          </div>
 
-        <div className="topbar-actions">
-          <ServiceWorkerManager />
+          <div className="topbar-actions">
+            <ServiceWorkerManager />
 
+            <button
+              className="btn-icon"
+              onClick={() => setIsSettingsOpen(true)}
+              title="Settings &amp; Default Rules"
+            >
+              <Sliders size={16} />
+            </button>
+          </div>
+        </header>
+
+        {/* Modern-Minimal Tactile Navigation Tabs */}
+        <nav className="nav-tab-bar" style={{ maxWidth: contentMaxWidth }} aria-label="Page Navigation">
           <button
-            className="btn-icon"
-            onClick={() => setIsSettingsOpen(true)}
-            title="Settings &amp; Default Rules"
+            className={`nav-tab-btn ${currentTab === 'sheetal_sangam' ? 'active' : ''}`}
+            onClick={() => setCurrentTab('sheetal_sangam')}
           >
-            <Sliders size={16} />
-          </button>
-        </div>
-      </header>
-
-      {/* Modern-Minimal Tactile Navigation Tabs */}
-      <nav className="nav-tab-bar" style={{ maxWidth: contentMaxWidth }} aria-label="Page Navigation">
-        <button
-          className={`nav-tab-btn ${currentTab === 'sheetal_sangam' ? 'active' : ''}`}
-          onClick={() => setCurrentTab('sheetal_sangam')}
-        >
-          <Building2 size={14} />
-          <span>Sheetal Sangam</span>
-        </button>
-
-        <button
-          className={`nav-tab-btn ${currentTab === 'costsheet' ? 'active' : ''}`}
-          onClick={() => setCurrentTab('costsheet')}
-        >
-          <TableIcon size={14} />
-          <span>Custom Calc</span>
-        </button>
-
-        <button
-          className={`nav-tab-btn ${currentTab === 'ladder' ? 'active' : ''}`}
-          onClick={() => setCurrentTab('ladder')}
-        >
-          <TrendingUp size={14} />
-          <span>CP Ladder</span>
-        </button>
-
-        <button
-          className={`nav-tab-btn ${currentTab === 'documents' ? 'active' : ''}`}
-          onClick={() => setCurrentTab('documents')}
-        >
-          <FolderCheck size={14} />
-          <span>Documents</span>
-        </button>
-      </nav>
-
-      {/* Main Tab Views */}
-      {currentTab === 'sheetal_sangam' && (
-        <SheetalSangamPage
-          onLoadIntoCustomCalculator={handleLoadSheetalUnit}
-          onOpenShareModal={() => setIsShareOpen(true)}
-        />
-      )}
-
-      {currentTab === 'costsheet' && (
-        <TableCalculator
-          inputs={inputs}
-          result={result}
-          onChange={handleInputsChange}
-          onOpenLadderPage={() => setCurrentTab('ladder')}
-        />
-      )}
-
-      {currentTab === 'ladder' && (
-        <BrokerageLadderPage
-          inputs={inputs}
-          result={result}
-          onUpdateBrokerage={(pct) => {
-            handleInputsChange({ ...inputs, brokeragePercent: pct });
-            setCurrentTab('costsheet');
-          }}
-        />
-      )}
-
-      {currentTab === 'documents' && (
-        <ReceivedDocsPage documents={receivedDocs} />
-      )}
-
-      {/* Sticky Bottom Action Bar */}
-      <footer className="bottom-bar">
-        <div className="bar-inner" style={{ maxWidth: contentMaxWidth }}>
-          <button className="btn-main" onClick={() => setIsShareOpen(true)}>
-            <Share2 size={16} />
-            <span>Share Cost Sheet</span>
+            <Building2 size={14} />
+            <span>Sheetal Sangam</span>
           </button>
 
           <button
-            className="btn-icon"
-            style={{ width: '44px', height: '44px' }}
-            onClick={handleResetToDefaults}
-            title="Reset to Defaults"
+            className={`nav-tab-btn ${currentTab === 'costsheet' ? 'active' : ''}`}
+            onClick={() => setCurrentTab('costsheet')}
           >
-            <RotateCcw size={16} />
+            <TableIcon size={14} />
+            <span>Custom Calc</span>
           </button>
-        </div>
-      </footer>
 
-      {/* Modals */}
-      <ShareModal
-        isOpen={isShareOpen}
-        onClose={() => setIsShareOpen(false)}
-        result={result}
-        inputs={inputs}
+          <button
+            className={`nav-tab-btn ${currentTab === 'ladder' ? 'active' : ''}`}
+            onClick={() => setCurrentTab('ladder')}
+          >
+            <TrendingUp size={14} />
+            <span>CP Ladder</span>
+          </button>
+
+          <button
+            className={`nav-tab-btn ${currentTab === 'documents' ? 'active' : ''}`}
+            onClick={() => setCurrentTab('documents')}
+          >
+            <FolderCheck size={14} />
+            <span>Documents</span>
+          </button>
+        </nav>
+
+        {/* Main Tab Views */}
+        {currentTab === 'sheetal_sangam' && (
+          <SheetalSangamPage
+            onLoadIntoCustomCalculator={handleLoadSheetalUnit}
+            onOpenShareModal={() => setIsShareOpen(true)}
+          />
+        )}
+
+        {currentTab === 'costsheet' && (
+          <TableCalculator
+            inputs={inputs}
+            result={result}
+            onChange={handleInputsChange}
+            onOpenLadderPage={() => setCurrentTab('ladder')}
+          />
+        )}
+
+        {currentTab === 'ladder' && (
+          <BrokerageLadderPage
+            inputs={inputs}
+            result={result}
+            onUpdateBrokerage={(pct) => {
+              handleInputsChange({ ...inputs, brokeragePercent: pct });
+              setCurrentTab('costsheet');
+            }}
+          />
+        )}
+
+        {currentTab === 'documents' && (
+          <ReceivedDocsPage documents={receivedDocs} />
+        )}
+
+        {/* Sticky Bottom Action Bar */}
+        <footer className="bottom-bar">
+          <div className="bar-inner" style={{ maxWidth: contentMaxWidth }}>
+            <button className="btn-main" onClick={() => setIsShareOpen(true)}>
+              <Share2 size={16} />
+              <span>Share Cost Sheet</span>
+            </button>
+
+            <button
+              className="btn-icon"
+              style={{ width: '44px', height: '44px' }}
+              onClick={handleResetToDefaults}
+              title="Reset to Defaults"
+            >
+              <RotateCcw size={16} />
+            </button>
+          </div>
+        </footer>
+
+        {/* Modals */}
+        <ShareModal
+          isOpen={isShareOpen}
+          onClose={() => setIsShareOpen(false)}
+          result={result}
+          inputs={inputs}
+          projectName={meta.projectName}
+          unitNumber={meta.unitNumber}
+          clientName={meta.clientName}
+        />
+
+        <SettingsDrawer
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          inputs={inputs}
+          onUpdateInputs={(updated) => handleInputsChange({ ...inputs, ...updated })}
+          onResetDefaults={handleResetToDefaults}
+        />
+      </div>
+
+      {/* ── Dedicated Print-Only Cost Sheet Document Template ── */}
+      <PrintTemplate
+        mode={currentTab === 'sheetal_sangam' ? 'sheetal_sangam' : 'custom'}
+        customInputs={inputs}
+        customResult={result}
+        sheetalScheme="CLP"
         projectName={meta.projectName}
-        unitNumber={meta.unitNumber}
-        clientName={meta.clientName}
       />
-
-      <SettingsDrawer
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        inputs={inputs}
-        onUpdateInputs={(updated) => handleInputsChange({ ...inputs, ...updated })}
-        onResetDefaults={handleResetToDefaults}
-      />
-    </div>
+    </>
   );
 }
